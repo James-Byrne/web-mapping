@@ -12,6 +12,8 @@ import {Page, Platform} from "ionic-angular";
 export class MapPage {
   private platform: Platform;
   private map: any;
+  private userMarker: any;
+  private userPosition: any;
 
   constructor(platform: Platform) {
     this.platform = platform;
@@ -40,8 +42,14 @@ export class MapPage {
           // set the map
           this.map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-          // show the user their location
-          this.addMarker("Your location");
+          // Set the users marker to the users current location
+          this.userMarker = new google.maps.Marker({
+            map: this.map,
+            position: this.userPosition,
+            title: "Your location"
+          });
+
+          this.followUser();
         },
         (error) => {
           console.log(error);
@@ -52,7 +60,23 @@ export class MapPage {
 
   // Follow user
   followUser () {
-    // TODO : Follow the user and provide their location
+    let options = {enableHighAccuracy: true};
+
+    // Update the users location every 5 seconds
+    window.setInterval(() => {
+      console.log("Updating user position");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Get the users Alattitude and longitude
+          this.userPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          this.userMarker.setPosition(this.userPosition);
+        },
+        (error) => {
+          console.log(error);
+        }, options
+      );
+    }, 500);
+
   }
 
   addMarker (markerContent: String) {
