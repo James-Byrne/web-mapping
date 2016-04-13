@@ -1,15 +1,14 @@
-import 'es6-shim';
-import {App, Platform} from 'ionic-angular';
-import {StatusBar} from 'ionic-native';
-import {TabsPage} from './pages/tabs/tabs';
-
+import "es6-shim";
+import {App, Platform} from "ionic-angular";
+import {StatusBar} from "ionic-native";
+import {MapPage} from "./pages/map/map";
 
 @App({
-  template: '<ion-nav [root]="rootPage"></ion-nav>',
+  template: "<ion-nav [root]='rootPage'></ion-nav>",
   config: {} // http://ionicframework.com/docs/v2/api/config/Config/
 })
 export class MyApp {
-  rootPage: any = TabsPage;
+  rootPage: any = MapPage;
 
   constructor(platform: Platform) {
     platform.ready().then(() => {
