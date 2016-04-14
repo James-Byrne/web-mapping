@@ -17,10 +17,9 @@ export class MapPage {
   private http: Http;
 
   private map: any;
-  private dublinFood: any;
-
+  // Tell the app to use more accurate means of measurement if possible such as GPS
+  private options = {enableHighAccuracy: true};
   private userMarker: any;
-  private userPosition: any;
 
   constructor(platform: Platform, http: Http) {
     this.platform = platform;
@@ -28,97 +27,76 @@ export class MapPage {
 
     // Load the users map
     this.loadMap();
-
-    // Get the list of food places in dublin
-    this.getDublinFood();
   }
 
   // Load the map
-  loadMap () {
-    // Wait for the platform to be ready otherwise google will not be referenced
-    this.platform.ready().then( () => {
-      // Tell the app to use more accurate means of measurement if possible
-      let options = {enableHighAccuracy: true};
+  loadMap() {
+    this.platform.ready().then(() => {
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // Get the users Alattitude and longitude
-          let latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          // Create a new instance of the Leaflet map
+          this.map = L.map("map", {zoomControl: false}).setView([position.coords.latitude, position.coords.longitude], 13);
 
-          // Set the maps default options
-          let mapOptions = {
-            center: latlng,
-            zoom: 15,
-            mapTypeID: google.maps.MapTypeId.ROADMAP
-          };
-
-          // set the map
-          this.map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-          // Set the users marker to the users current location
-          this.userMarker = new google.maps.Marker({
-            map: this.map,
-            position: this.userPosition,
-            title: "Your location"
+          // Control for zooming in and out
+          let control = L.control.zoom({
+            position: "bottomright"
           });
 
+          // Add the control to the map
+          this.map.addControl(control);
+
+          // Add a tile layer to the map
+          L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+            maxZoom: 18
+          }).addTo(this.map);
+
+          // Add a user marker which shows their current location
+          // The zIndexOffset ensure that the users marker is always ontop of any other markers nearby
+          this.userMarker = L.marker([position.coords.latitude, position.coords.longitude], {
+            zIndexOffset: 1000
+          }).addTo(this.map);
+
+          // Add a popup to the userMarker
+          this.userMarker.bindPopup("<h4>Your Location</h4>");
+
+          // Follow the Users position
           this.followUser();
+
+          // Get the list of food places in dublin
+          this.getDublinFood();
         },
         (error) => {
           console.log(error);
-        }, options
-      );
+        }, this.options);
     });
   }
 
   // Follow user
-  followUser () {
-    let options = {enableHighAccuracy: true};
-
-    // Update the users location every 5 seconds
+  followUser() {
+    // Check for the users location twice a second
     window.setInterval(() => {
-      console.log("Updating user position");
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // Get the users Alattitude and longitude
-          this.userPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          this.userMarker.setPosition(this.userPosition);
+          // Change the variable names for use with Leaflet
+          position.lat = position.coords.latitude;
+          position.lng = position.coords.longitude;
+          // Set the markers new location
+          this.userMarker.setLatLng(position);
         },
         (error) => {
+          console.log("There was an error :  ......");
           console.log(error);
-        }, options
-      );
+        }, this.options);
     }, 500);
-
   }
 
-  getDublinFood () {
-    // Make a http request to the server and get the data
+  getDublinFood() {
+    // // Make a http request to the server and get the data
     this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
-      this.dublinFood = data.features;
-      console.log(this.dublinFood);
-    });
-  }
+      // Add the markers to the map
+      L.geoJson(data.features).addTo(this.map);
 
-  addMarker (markerContent: String) {
-    // Setup the markers options
-    let marker = new google.maps.Marker({
-      map: this.map,
-      animation: google.maps.Animation.DROP,
-      position: this.map.getCenter()
-    });
-
-    // Add the info window to the marker
-    this.addInfoWindow(marker, markerContent);
-  }
-
-  addInfoWindow (marker, content: String) {
-    let infoWindow = new google.maps.InfoWindow({
-      content: content
-    });
-
-    google.maps.event.addListener(marker, "click", () => {
-      infoWindow.open(this.map, marker);
     });
   }
 
