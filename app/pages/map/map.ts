@@ -2,6 +2,9 @@ import {Page, Platform} from "ionic-angular";
 import {Http} from "angular2/http";
 import "rxjs/add/operator/map";
 
+// Suppress typescript errors
+declare var L: any;
+
 /*
   Generated class for the MapPage page.
 
@@ -64,7 +67,7 @@ export class MapPage {
           this.followUser();
 
           // Get the list of food places in dublin
-          this.getDublinFood();
+          // this.getDublinFood();
         },
         (error) => {
           console.log(error);
@@ -78,11 +81,8 @@ export class MapPage {
     window.setInterval(() => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // Change the variable names for use with Leaflet
-          position.lat = position.coords.latitude;
-          position.lng = position.coords.longitude;
           // Set the markers new location
-          this.userMarker.setLatLng(position);
+          this.userMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
         },
         (error) => {
           console.log("There was an error :  ......");
