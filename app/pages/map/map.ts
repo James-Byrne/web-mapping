@@ -56,6 +56,7 @@ export class MapPage {
 
           // Add a user marker which shows their current location
           // The zIndexOffset ensure that the users marker is always ontop of any other markers nearby
+          // TODO : Set a custom user marker see : http://leafletjs.com/examples/custom-icons.html
           this.userMarker = L.marker([position.coords.latitude, position.coords.longitude], {
             zIndexOffset: 1000
           }).addTo(this.map);
