@@ -2,7 +2,10 @@ import {Page, Platform} from "ionic-angular";
 import {Http} from "angular2/http";
 import "rxjs/add/operator/map";
 
+// Import the Ionic Native Geolocation Plugin
 import {Geolocation} from "ionic-native";
+// Import the Ionic Native Deveice Orientation Plugin
+import {DeviceOrientation} from "ionic-native";
 
 // Suppress typescript errors
 declare var L: any;
@@ -24,7 +27,9 @@ export class MapPage {
   private map: any;
   // Tell the app to use more accurate means of measurement if possible such as GPS
   private options = { enableHighAccuracy: true };
+
   private userMarker: any;
+  private userOrientation: any;
 
   constructor(platform: Platform, http: Http) {
     this.platform = platform;
@@ -93,6 +98,17 @@ export class MapPage {
     watch.subscribe(pos => {
       this.userMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
     });
+
+    // Get the users current heading
+    DeviceOrientation.getCurrentHeading().then(
+      data => console.log(data),
+      error => console.log(error)
+    );
+
+    // Watch the device compass heading change
+    this.userOrientation = DeviceOrientation.watchHeading().subscribe(
+      data => console.log(data)
+    );
   }
 
   getDublinFood() {
