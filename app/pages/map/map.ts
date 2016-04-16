@@ -41,52 +41,51 @@ export class MapPage {
 
   // Load the map
   loadMap() {
-    this.platform.ready().then(() => {
+    Geolocation.getCurrentPosition().then(pos => {
+      // Create a new instance of the Leaflet map
+      this.map = L.map("map", { zoomControl: false }).setView([pos.coords.latitude, pos.coords.longitude], 13);
 
-      Geolocation.getCurrentPosition().then(pos => {
-        // Create a new instance of the Leaflet map
-        this.map = L.map("map", { zoomControl: false }).setView([pos.coords.latitude, pos.coords.longitude], 13);
-
-        // Control for zooming in and out
-        let control = L.control.zoom({
-          position: "bottomright"
-        });
-
-        // Add the control to the map
-        this.map.addControl(control);
-
-        // Add a tile layer to the map
-        L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-          maxZoom: 18
-        }).addTo(this.map);
-
-        // Create a custom icon for the user
-        let userIcon = L.icon({
-          iconUrl: "./images/navigation-icon.png",
-          iconSize: [40, 40], // size of the icon
-          iconAnchor: [20, 20], // point of the icon which will correspond to marker"s location
-          popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
-        });
-
-        // Add a user marker which shows their current location
-        // The zIndexOffset ensure that the users marker is always ontop of any other markers nearby
-        this.userMarker = L.marker([pos.coords.latitude, pos.coords.longitude], {
-          zIndexOffset: 1000,
-          icon: userIcon,
-        }).addTo(this.map);
-
-        // Add a popup to the userMarker
-        this.userMarker.bindPopup("<h4>Your Location</h4>");
-
-        // Follow the Users position
-        this.followUser();
-
-        // Get the list of food places in dublin
-        // this.getDublinFood();
-      }).catch(err => {
-        console.log("There was an error getting the map ");
-        console.log(err);
+      // Control for zooming in and out
+      let control = L.control.zoom({
+        position: "bottomright"
       });
+
+      // Add the control to the map
+      this.map.addControl(control);
+
+      // Add a tile layer to the map
+      L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+        maxZoom: 18
+      }).addTo(this.map);
+
+      // Create a custom icon for the user
+      let userIcon = L.icon({
+        iconUrl: "./images/navigation-icon.png",
+        iconSize: [40, 40], // size of the icon
+        iconAnchor: [20, 20], // point of the icon which will correspond to marker"s location
+        popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+      });
+
+      // Add a user marker which shows their current location
+      // The zIndexOffset ensure that the users marker is always ontop of any other markers nearby
+      this.userMarker = L.marker([pos.coords.latitude, pos.coords.longitude], {
+        zIndexOffset: 1000,
+        icon: userIcon,
+        rotationAngle: 90,
+        rotationOrigin: "center center"
+      }).addTo(this.map);
+      console.log(this.userMarker);
+      // Add a popup to the userMarker
+      this.userMarker.bindPopup("<h4>Your Location</h4>");
+
+      // Follow the Users position
+      this.followUser();
+
+      // Get the list of food places in dublin
+      // this.getDublinFood();
+    }).catch(err => {
+      console.log("There was an error getting the map ");
+      console.log(err);
     });
   }
 
@@ -103,7 +102,7 @@ export class MapPage {
     DeviceOrientation.getCurrentHeading().then(
       data => {
         // TODO : rotate the icon to match users orientation
-        // this.userMarker.setIconAngle(data.magneticHeading);
+        // this.userMarker.setRotationAngle(data.magneticHeading);
       },
       error => console.log(error)
     );
@@ -112,6 +111,7 @@ export class MapPage {
     this.userOrientation = DeviceOrientation.watchHeading().subscribe(
       data => {
         // TODO : rotate the icon to match users orientation
+        // this.userMarker.setRotationAngle(data.magneticHeading);
       }
     );
   }
