@@ -1,4 +1,4 @@
-import {Page, Platform} from "ionic-angular";
+import {Page} from "ionic-angular";
 import {Http} from "angular2/http";
 import "rxjs/add/operator/map";
 
@@ -21,7 +21,6 @@ declare var L: any;
   templateUrl: "build/pages/map/map.html",
 })
 export class MapPage {
-  private platform: Platform;
   private http: Http;
 
   private map: any;
@@ -31,9 +30,11 @@ export class MapPage {
   private userMarker: any;
   private userOrientation: any;
 
-  constructor(platform: Platform, http: Http) {
-    this.platform = platform;
+  constructor(http: Http) {
     this.http = http;
+    console.log("Entered the map constructor");
+    // Add the rotate marker function to L
+    this.addRotateMarker();
 
     // Load the users map
     this.loadMap();
@@ -41,10 +42,12 @@ export class MapPage {
 
   // Load the map
   loadMap() {
+    console.log("Entered LoadMap()");
     Geolocation.getCurrentPosition().then(pos => {
+      console.log("Entered get current position");
       // Create a new instance of the Leaflet map
       this.map = L.map("map", { zoomControl: false }).setView([pos.coords.latitude, pos.coords.longitude], 13);
-
+      console.log(this.map);
       // Control for zooming in and out
       let control = L.control.zoom({
         position: "bottomright"
@@ -74,7 +77,7 @@ export class MapPage {
         rotationAngle: 90,
         rotationOrigin: "center center"
       }).addTo(this.map);
-      console.log(this.userMarker);
+
       // Add a popup to the userMarker
       this.userMarker.bindPopup("<h4>Your Location</h4>");
 
@@ -102,7 +105,7 @@ export class MapPage {
     DeviceOrientation.getCurrentHeading().then(
       data => {
         // TODO : rotate the icon to match users orientation
-        // this.userMarker.setRotationAngle(data.magneticHeading);
+        this.userMarker.setRotationAngle(data.magneticHeading);
       },
       error => console.log(error)
     );
@@ -111,8 +114,9 @@ export class MapPage {
     this.userOrientation = DeviceOrientation.watchHeading().subscribe(
       data => {
         // TODO : rotate the icon to match users orientation
-        // this.userMarker.setRotationAngle(data.magneticHeading);
-      }
+        this.userMarker.setRotationAngle(data.magneticHeading);
+      },
+      error => console.log(error)
     );
   }
 
@@ -122,6 +126,58 @@ export class MapPage {
       // Add the markers to the map
       L.geoJson(data.features).addTo(this.map);
 
+    });
+  }
+
+  // TODO : Move this to its own file and properly reference it
+  addRotateMarker() {
+    // save these original methods before they are overwritten
+    let proto_initIcon = L.Marker.prototype._initIcon;
+    let proto_setPos = L.Marker.prototype._setPos;
+
+    let oldIE = (L.DomUtil.TRANSFORM === "msTransform");
+
+    L.Marker.addInitHook(function() {
+      let iconAnchor = this.options.icon.options.iconAnchor;
+      if (iconAnchor) {
+        iconAnchor = (iconAnchor[0] + "px " + iconAnchor[1] + "px");
+      }
+      this.options.rotationOrigin = this.options.rotationOrigin || iconAnchor || "center bottom";
+      this.options.rotationAngle = this.options.rotationAngle || 0;
+    });
+
+    L.Marker.include({
+      _initIcon: function() {
+        proto_initIcon.call(this);
+      },
+
+      _setPos: function(pos) {
+        proto_setPos.call(this, pos);
+
+        if (this.options.rotationAngle) {
+          this._icon.style[L.DomUtil.TRANSFORM + "Origin"] = this.options.rotationOrigin;
+
+          if (oldIE) {
+            // for IE 9, use the 2D rotation
+            this._icon.style[L.DomUtil.TRANSFORM] = " rotate(" + this.options.rotationAngle + "deg)";
+          } else {
+            // for modern browsers, prefer the 3D accelerated version
+            this._icon.style[L.DomUtil.TRANSFORM] += " rotateZ(" + this.options.rotationAngle + "deg)";
+          }
+        }
+      },
+
+      setRotationAngle: function(angle) {
+        this.options.rotationAngle = angle;
+        this.update();
+        return this;
+      },
+
+      setRotationOrigin: function(origin) {
+        this.options.rotationOrigin = origin;
+        this.update();
+        return this;
+      }
     });
   }
 
