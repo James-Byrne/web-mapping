@@ -62,7 +62,7 @@ export class MapPage {
 
         // Create a custom icon for the user
         let userIcon = L.icon({
-          iconUrl: "../../images/navigation-icon.png",
+          iconUrl: "./images/navigation-icon.png",
           iconSize: [40, 40], // size of the icon
           iconAnchor: [20, 20], // point of the icon which will correspond to marker"s location
           popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
@@ -101,13 +101,18 @@ export class MapPage {
 
     // Get the users current heading
     DeviceOrientation.getCurrentHeading().then(
-      data => console.log(data),
+      data => {
+        // TODO : rotate the icon to match users orientation
+        // this.userMarker.setIconAngle(data.magneticHeading);
+      },
       error => console.log(error)
     );
 
     // Watch the device compass heading change
     this.userOrientation = DeviceOrientation.watchHeading().subscribe(
-      data => console.log(data)
+      data => {
+        // TODO : rotate the icon to match users orientation
+      }
     );
   }
 
