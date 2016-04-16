@@ -2,6 +2,8 @@ import {Page, Platform} from "ionic-angular";
 import {Http} from "angular2/http";
 import "rxjs/add/operator/map";
 
+import {Geolocation} from 'ionic-native';
+
 // Suppress typescript errors
 declare var L: any;
 
@@ -35,11 +37,10 @@ export class MapPage {
   // Load the map
   loadMap() {
     this.platform.ready().then(() => {
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // Create a new instance of the Leaflet map
-          this.map = L.map("map", {zoomControl: false}).setView([position.coords.latitude, position.coords.longitude], 13);
+        
+        Geolocation.getCurrentPosition().then(pos => { 
+            // Create a new instance of the Leaflet map
+          this.map = L.map("map", {zoomControl: false}).setView([pos.coords.latitude, pos.coords.longitude], 13);
 
           // Control for zooming in and out
           let control = L.control.zoom({
@@ -62,10 +63,9 @@ export class MapPage {
             popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
           });
           
-          
           // Add a user marker which shows their current location
           // The zIndexOffset ensure that the users marker is always ontop of any other markers nearby
-          this.userMarker = L.marker([position.coords.latitude, position.coords.longitude], {
+          this.userMarker = L.marker([pos.coords.latitude, pos.coords.longitude], {
             zIndexOffset: 1000,
             icon:  userIcon,
           }).addTo(this.map);
@@ -78,27 +78,21 @@ export class MapPage {
 
           // Get the list of food places in dublin
           // this.getDublinFood();
-        },
-        (error) => {
-          console.log(error);
-        }, this.options);
+        }).catch(err => {
+          console.log("There was an error getting the map ");
+          console.log(err);            
+        });
     });
   }
 
   // Follow user
   followUser() {
-    // Check for the users location twice a second
-    window.setInterval(() => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // Set the markers new location
-          this.userMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
-        },
-        (error) => {
-          console.log("There was an error :  ......");
-          console.log(error);
-        }, this.options);
-    }, 500);
+    // Follow the users location 
+    let watch = Geolocation.watchPosition();
+    // When the users location changes update the location of the marker 
+    watch.subscribe(pos => {
+      this.userMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+    });
   }
 
   getDublinFood() {
