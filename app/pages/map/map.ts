@@ -74,7 +74,6 @@ export class MapPage {
       this.userMarker = L.marker([pos.coords.latitude, pos.coords.longitude], {
         zIndexOffset: 1000,
         icon: userIcon,
-        rotationAngle: 90,
         rotationOrigin: "center center"
       }).addTo(this.map);
 
@@ -103,11 +102,11 @@ export class MapPage {
 
     // Get the users current heading
     DeviceOrientation.getCurrentHeading().then(
-      data => {
+      (data) => {
         // TODO : rotate the icon to match users orientation
         this.userMarker.setRotationAngle(data.magneticHeading);
       },
-      error => console.log(error)
+      (error) => console.log(error)
     );
 
     // Watch the device compass heading change
