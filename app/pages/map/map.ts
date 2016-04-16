@@ -54,11 +54,20 @@ export class MapPage {
             maxZoom: 18
           }).addTo(this.map);
 
+          // Create a custom icon for the user
+          let userIcon = L.icon({
+            iconUrl: "../../images/navigation-icon.png",
+            iconSize:     [40, 40], // size of the icon
+            iconAnchor:   [20, 20], // point of the icon which will correspond to marker"s location
+            popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+          });
+          
+          
           // Add a user marker which shows their current location
           // The zIndexOffset ensure that the users marker is always ontop of any other markers nearby
-          // TODO : Set a custom user marker see : http://leafletjs.com/examples/custom-icons.html
           this.userMarker = L.marker([position.coords.latitude, position.coords.longitude], {
-            zIndexOffset: 1000
+            zIndexOffset: 1000,
+            icon:  userIcon,
           }).addTo(this.map);
 
           // Add a popup to the userMarker
