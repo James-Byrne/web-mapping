@@ -152,6 +152,9 @@ export class MapPage {
   }
 
   getDublinFood() {
+    // TODO : Load only the nearby markers
+    // TODO : Add a popup to each of the markers
+    // TODO : Give the markers custom icons
     // // Make a http request to the server and get the data
     this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
       // Add the markers to the map
