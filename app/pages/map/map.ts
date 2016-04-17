@@ -15,6 +15,16 @@ declare var L: any;
 
   See http://ionicframework.com/docs/v2/components/#navigation for more info on
   Ionic pages and navigation.
+
+  @author : James Byrne
+  @description
+  This class manages the map loading and interactions.
+
+  @functions :
+    - loadMap() : Load the map from the leaflet CDN and assign it its default properties
+    - followUser() : Follow the users movements and orientation
+    - getDublinFood() : Load all of the GeoServer data into the map view
+    - addRotateMarker() : Code from : https://github.com/bbecquet/Leaflet.RotatedMarker. Its put here because the node module isnt working
 */
 
 @Page({
@@ -46,7 +56,9 @@ export class MapPage {
 
   // Load the map
   loadMap() {
+    // Ensures that the application is ready before attempting to reach the Cordova plugins
     this.platform.ready().then(() => {
+      // Get the users current location
       Geolocation.getCurrentPosition().then(pos => {
         // Create a new instance of the Leaflet map
         this.map = L.map("map", { zoomControl: false }).setView([pos.coords.latitude, pos.coords.longitude], 13);
@@ -107,7 +119,6 @@ export class MapPage {
     // Get the users current heading
     DeviceOrientation.getCurrentHeading().then(
       (data) => {
-        // TODO : rotate the icon to match users orientation
         this.userMarker.setRotationAngle(data.magneticHeading);
       },
       (error) => {
@@ -125,7 +136,6 @@ export class MapPage {
     // Watch the device compass heading change
     this.userOrientation = DeviceOrientation.watchHeading().subscribe(
       (data) => {
-        // TODO : rotate the icon to match users orientation
         this.userMarker.setRotationAngle(data.magneticHeading);
       },
       (error) => {
