@@ -25,6 +25,11 @@ declare var L: any;
     - followUser() : Follow the users movements and orientation
     - getDublinFood() : Load all of the GeoServer data into the map view
     - addRotateMarker() : Code from : https://github.com/bbecquet/Leaflet.RotatedMarker. Its put here because the node module isnt working
+
+  TODO : @functions
+    - followMe() : The user can set the screen to follow them, essentially making their location the center of the screen
+    - showOnly() : Show only the selected type of amenity on the map
+    - findNearest() : Give the user directions to the nearest X where X is a type of amenity
 */
 
 @Page({
@@ -152,14 +157,14 @@ export class MapPage {
   }
 
   getDublinFood() {
-    // TODO : Load only the nearby markers
-    // TODO : Add a popup to each of the markers
-    // TODO : Give the markers custom icons
-    // // Make a http request to the server and get the data
+    // TODO : Load only the nearby markers, see : https://github.com/mapbox/leaflet-knn
+    // TODO : Add a popup to each of the markers, see : http://leafletjs.com/examples/geojson.html, looking for function onEachFeature()
+    // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html and above
+
+    // Make a http request to the server and get the data
     this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
       // Add the markers to the map
       L.geoJson(data.features).addTo(this.map);
-
     });
   }
 
