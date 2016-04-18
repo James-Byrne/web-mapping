@@ -9,6 +9,7 @@ import {DeviceOrientation} from "ionic-native";
 
 // Suppress typescript errors
 declare var L: any;
+declare var leafletKnn: any;
 
 /*
   Generated class for the MapPage page.
@@ -41,6 +42,7 @@ export class MapPage {
   private platform: Platform;
 
   private map: any;
+  private geoJson: any;
   // Tell the app to use more accurate means of measurement if possible such as GPS
   private options = { enableHighAccuracy: true };
 
@@ -177,6 +179,9 @@ export class MapPage {
     }
     // Make a http request to the server and get the data
     this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
+      // Make data available for other functions 
+      this.geoJson = data;
+
       // Add the markers to the map
       L.geoJson(data.features, {
         onEachFeature: onEachFeature
