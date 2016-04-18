@@ -161,6 +161,7 @@ export class MapPage {
   getDublinFood() {
     // TODO : Load only the nearby markers, see : https://github.com/mapbox/leaflet-knn
     // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html and above
+    // TODO : Add markers to a cluster group, see : https://github.com/Leaflet/Leaflet.markercluster && https://github.com/DefinitelyTyped/DefinitelyTyped/blob/cc3d223a946f661eff871787edeb0fcb8f0db156/leaflet-markercluster/leaflet-markercluster-tests.ts
 
     function onEachFeature(feature, layer) {
       // does this feature have a property named name
