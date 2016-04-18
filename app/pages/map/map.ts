@@ -66,7 +66,7 @@ export class MapPage {
       // Get the users current location
       Geolocation.getCurrentPosition().then(pos => {
         // Create a new instance of the Leaflet map
-        this.map = L.map("map", { zoomControl: false }).setView([pos.coords.latitude, pos.coords.longitude], 13);
+        this.map = L.map("map", { zoomControl: false }).setView([pos.coords.latitude, pos.coords.longitude], 16);
 
         // Control for zooming in and out
         let control = L.control.zoom({
