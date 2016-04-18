@@ -104,7 +104,7 @@ export class MapPage {
         this.followUser();
 
         // Get the list of food places in dublin
-        // this.getDublinFood();
+        this.getDublinFood();
       }).catch(err => {
         console.log("There was an error getting the map ");
         console.log(err);
@@ -158,13 +158,29 @@ export class MapPage {
 
   getDublinFood() {
     // TODO : Load only the nearby markers, see : https://github.com/mapbox/leaflet-knn
-    // TODO : Add a popup to each of the markers, see : http://leafletjs.com/examples/geojson.html, looking for function onEachFeature()
     // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html and above
 
+    function onEachFeature(feature, layer) {
+      // does this feature have a property named name
+      if (feature.properties && feature.properties.name) {
+        // If so add its name
+        let popupText = feature.properties.name;
+
+        if (feature.properties.cuisine) {
+          // Does it serve food, if so add that on a new line
+          // Regex to get rid of underscroes in words such as fish_and_chips
+          popupText = popupText + " - Serving : " + feature.properties.cuisine.replace(/_/g, " ");
+        }
+        // Add the popup to the icon with text
+        layer.bindPopup(popupText);
+      }
+    }
     // Make a http request to the server and get the data
     this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
       // Add the markers to the map
-      L.geoJson(data.features).addTo(this.map);
+      L.geoJson(data.features, {
+        onEachFeature: onEachFeature
+      }).addTo(this.map);
     });
   }
 
