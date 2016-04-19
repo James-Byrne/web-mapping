@@ -53,6 +53,10 @@ export class MapPage {
   private userMarker: any;
   private userOrientation: any;
 
+  // Values for the findNearest alert
+  private radioOpen: boolean;
+  private radioResult: any;
+
   constructor(http: Http, nav: NavController, platform: Platform) {
     this.http = http;
     this.nav = nav;
@@ -191,4 +195,44 @@ export class MapPage {
     });
   }
 
+
+  // Find the 5 nearest markers to the user
+  findNearest() {
+    // Create an index that can be used to search for the nearest marker
+    let index = leafletKnn(L.geoJson(this.geoJson.features));
+
+    // Get the 5 closest markers to the userMarker
+    let nearest = index.nearest(this.userMarker.getLatLng(), 5, 1000);
+
+    // List the five options in an alert
+    let alert = Alert.create();
+
+    // Set the alerts title
+    alert.setTitle("5 closest");
+
+    // Add an input for each of the nearest amenities
+    for (let i = 0; i < nearest.length; i++) {
+      alert.addInput({
+        type: "radio",
+        label: nearest[i].layer.feature.properties.name,
+        value: [nearest[i].lat, nearest[i].lon].toString()
+      });
+    }
+    // Add a cancel button
+    alert.addButton("Cancel");
+
+    // Add the ok button which will return the users selected value
+    alert.addButton({
+      text: "OK",
+      handler: data => {
+        this.radioOpen = false;
+        this.radioResult = data;
+      }
+    });
+
+    // Oen the alert to the user
+    this.nav.present(alert).then(() => {
+      this.radioOpen = true;
+    });
+  }
 }
