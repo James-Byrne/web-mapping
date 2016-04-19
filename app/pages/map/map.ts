@@ -55,6 +55,7 @@ export class MapPage {
 
   private map: any;
   private geoJson: any;
+
   // Tell the app to use more accurate means of measurement if possible such as GPS
   private options = { enableHighAccuracy: true };
 
@@ -91,7 +92,7 @@ export class MapPage {
         this.map.addControl(control);
 
         // Add a tile layer to the map
-        L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+        this.tileLayer = L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
           maxZoom: 18
         }).addTo(this.map);
 
@@ -119,6 +120,7 @@ export class MapPage {
 
         // Get the list of food places in dublin
         this.getDublinFood();
+
       }).catch(err => {
         console.log("There was an error getting the map ");
         console.log(err);
@@ -141,7 +143,6 @@ export class MapPage {
         this.userMarker.setRotationAngle(data.magneticHeading);
       },
       (error) => {
-        console.log(error);
         // Show the error as an alert
         let alert = Alert.create({
           title: "Error!",
@@ -158,7 +159,6 @@ export class MapPage {
         this.userMarker.setRotationAngle(data.magneticHeading);
       },
       (error) => {
-        console.log(error);
         // Show the error as an alert
         let alert = Alert.create({
           title: "Error!",
@@ -196,7 +196,7 @@ export class MapPage {
       this.geoJson = data;
 
       // Add the markers to the map
-      L.geoJson(data.features, {
+      this.jsonLayer = L.geoJson(data.features, {
         onEachFeature: onEachFeature
       }).addTo(this.map);
     });
