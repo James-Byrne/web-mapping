@@ -49,6 +49,10 @@ export class MapPage {
   private nav: NavController;
   private platform: Platform;
 
+  // Layers for managing the number of markers to be loaded
+  private tileLayer: any;
+  private jsonLayer: any;
+
   private map: any;
   private geoJson: any;
   // Tell the app to use more accurate means of measurement if possible such as GPS
