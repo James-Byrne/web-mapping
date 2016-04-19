@@ -57,9 +57,8 @@ export class MapPage {
   private userMarker: any;
   private userOrientation: any;
 
-  // Values for the findNearest alert
+  // Value for opening/closing the findNearest alert
   private radioOpen: boolean;
-  private radioResult: any;
 
   constructor(http: Http, nav: NavController, platform: Platform) {
     this.http = http;
@@ -230,7 +229,17 @@ export class MapPage {
       text: "OK",
       handler: data => {
         this.radioOpen = false;
-        this.radioResult = data;
+
+        // Split the data into two floats (Lat, Lng)
+        data = data.split(",");
+
+        // Plot a route from the user to their target
+        L.Routing.control({
+          waypoints: [
+            this.userMarker.getLatLng(),
+            [parseFloat(data[0]), parseFloat(data[1])]
+          ]
+        }).addTo(this.map);
       }
     });
 
