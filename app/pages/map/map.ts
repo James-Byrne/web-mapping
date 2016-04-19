@@ -11,8 +11,10 @@ import {DeviceOrientation} from "ionic-native";
 declare var L: any;
 declare var require: any;
 
-// Import the leafletKnn library
+// Import the leafletKnn library, see : https://github.com/mapbox/leaflet-knn
 let leafletKnn = require("leaflet-knn");
+// Add the RotatedMarker functions to the leaflet marker class, see : https://github.com/bbecquet/Leaflet.RotatedMarker
+import "leaflet-rotatedmarker";
 
 /*
   Generated class for the MapPage page.
@@ -28,7 +30,6 @@ let leafletKnn = require("leaflet-knn");
     - loadMap() : Load the map from the leaflet CDN and assign it its default properties
     - followUser() : Follow the users movements and orientation
     - getDublinFood() : Load all of the GeoServer data into the map view
-    - addRotateMarker() : Code from : https://github.com/bbecquet/Leaflet.RotatedMarker. Its put here because the node module isnt working
 
   TODO : @functions
     - followMe() : The user can set the screen to follow them, essentially making their location the center of the screen
@@ -56,9 +57,6 @@ export class MapPage {
     this.http = http;
     this.nav = nav;
     this.platform = platform;
-
-    // Add the rotate marker function to L
-    this.addRotateMarker();
 
     // Load the users map
     this.loadMap();
@@ -190,58 +188,6 @@ export class MapPage {
       L.geoJson(data.features, {
         onEachFeature: onEachFeature
       }).addTo(this.map);
-    });
-  }
-
-  // TODO : Move this to its own file and properly reference it
-  addRotateMarker() {
-    // save these original methods before they are overwritten
-    let proto_initIcon = L.Marker.prototype._initIcon;
-    let proto_setPos = L.Marker.prototype._setPos;
-
-    let oldIE = (L.DomUtil.TRANSFORM === "msTransform");
-
-    L.Marker.addInitHook(function() {
-      let iconAnchor = this.options.icon.options.iconAnchor;
-      if (iconAnchor) {
-        iconAnchor = (iconAnchor[0] + "px " + iconAnchor[1] + "px");
-      }
-      this.options.rotationOrigin = this.options.rotationOrigin || iconAnchor || "center bottom";
-      this.options.rotationAngle = this.options.rotationAngle || 0;
-    });
-
-    L.Marker.include({
-      _initIcon: function() {
-        proto_initIcon.call(this);
-      },
-
-      _setPos: function(pos) {
-        proto_setPos.call(this, pos);
-
-        if (this.options.rotationAngle) {
-          this._icon.style[L.DomUtil.TRANSFORM + "Origin"] = this.options.rotationOrigin;
-
-          if (oldIE) {
-            // for IE 9, use the 2D rotation
-            this._icon.style[L.DomUtil.TRANSFORM] = " rotate(" + this.options.rotationAngle + "deg)";
-          } else {
-            // for modern browsers, prefer the 3D accelerated version
-            this._icon.style[L.DomUtil.TRANSFORM] += " rotateZ(" + this.options.rotationAngle + "deg)";
-          }
-        }
-      },
-
-      setRotationAngle: function(angle) {
-        this.options.rotationAngle = angle;
-        this.update();
-        return this;
-      },
-
-      setRotationOrigin: function(origin) {
-        this.options.rotationOrigin = origin;
-        this.update();
-        return this;
-      }
     });
   }
 
