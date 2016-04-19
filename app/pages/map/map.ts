@@ -9,7 +9,10 @@ import {DeviceOrientation} from "ionic-native";
 
 // Suppress typescript errors
 declare var L: any;
-declare var leafletKnn: any;
+declare var require: any;
+
+// Import the leafletKnn library
+let leafletKnn = require("leaflet-knn");
 
 /*
   Generated class for the MapPage page.
