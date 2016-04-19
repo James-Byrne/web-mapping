@@ -39,6 +39,7 @@ let leafletRouting = require("leaflet-routing-machine");
   TODO : @functions
     - followMe() : The user can set the screen to follow them, essentially making their location the center of the screen
     - filterBy() : Allow a user to filter the type of amenity they are looking for by category
+    - findMe() : Center the map on the userMarker on button press
 */
 
 @Page({
