@@ -13,8 +13,12 @@ declare var require: any;
 
 // Import the leafletKnn library, see : https://github.com/mapbox/leaflet-knn
 let leafletKnn = require("leaflet-knn");
+
 // Add the RotatedMarker functions to the leaflet marker class, see : https://github.com/bbecquet/Leaflet.RotatedMarker
 import "leaflet-rotatedmarker";
+
+// Add the leaflet-routing-machine module, see : http://www.liedman.net/leaflet-routing-machine/
+let leafletRouting = require("leaflet-routing-machine");
 
 /*
   Generated class for the MapPage page.
