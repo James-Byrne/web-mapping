@@ -33,8 +33,8 @@ import "leaflet-rotatedmarker";
 
   TODO : @functions
     - followMe() : The user can set the screen to follow them, essentially making their location the center of the screen
-    - showOnly() : Show only the selected type of amenity on the map
     - findNearest() : Give the user directions to the nearest X where X is a type of amenity
+    - filterBy() : Allow a user to filter the type of amenity they are looking for by category
 */
 
 @Page({
