@@ -40,6 +40,7 @@ let leafletRouting = require("leaflet-routing-machine");
     - followMe() : The user can set the screen to follow them, essentially making their location the center of the screen
     - filterBy() : Allow a user to filter the type of amenity they are looking for by category
     - findMe() : Center the map on the userMarker on button press
+    - loadNearby() : Load only the markes which should be on the screen
 */
 
 @Page({
@@ -172,11 +173,24 @@ export class MapPage {
   }
 
   getDublinFood() {
-    // TODO : Load only the nearby markers, see : https://github.com/mapbox/leaflet-knn
-    // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html and above
-    // TODO : Add markers to a cluster group, see : https://github.com/Leaflet/Leaflet.markercluster && https://github.com/DefinitelyTyped/DefinitelyTyped/blob/cc3d223a946f661eff871787edeb0fcb8f0db156/leaflet-markercluster/leaflet-markercluster-tests.ts
+    // Make a http request to the server and get the data
+    this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
+      // Make data available for other functions
+      this.geoJson = data;
 
-    function onEachFeature(feature, layer) {
+      // Load only the markers that are visible on the map
+      this.loadNearby();
+    });
+  }
+
+  // Load the nearby Markers
+  loadNearby() {
+
+    // Function that is executed each time a marker is added
+    // TODO : Add markers to a cluster group, see : https://github.com/Leaflet/Leaflet.markercluster && https://github.com/DefinitelyTyped/DefinitelyTyped/blob/cc3d223a946f661eff871787edeb0fcb8f0db156/leaflet-markercluster/leaflet-markercluster-tests.ts
+    // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html
+    // TODO : Add the different categories to different layers, see : http://bl.ocks.org/zross/f0306ca14e8202a0fe73
+    let onEachFeature = (feature, layer) => {
       // does this feature have a property named name
       if (feature.properties && feature.properties.name) {
         // If so add its name
@@ -190,19 +204,22 @@ export class MapPage {
         // Add the popup to the icon with text
         layer.bindPopup(popupText);
       }
-    }
-    // Make a http request to the server and get the data
-    this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
-      // Make data available for other functions
-      this.geoJson = data;
+    };
 
-      // Add the markers to the map
-      this.jsonLayer = L.geoJson(data.features, {
-        onEachFeature: onEachFeature
-      }).addTo(this.map);
-    });
+    // TODO : Filter out markers that should not be displayed
+    let filter = (feature, layer) => {
+      // Look for the markers within the current maps bounds
+      // The coords have to be specified as below in order for the function to read the features coords correctly
+      if (this.map.getBounds().contains([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])) {
+        return feature;
+      }
+    };
+
+    this.jsonLayer = L.geoJson(this.geoJson.features, {
+      onEachFeature: onEachFeature,
+      filter: filter
+    }).addTo(this.map);
   }
-
 
   // Find the 5 nearest markers to the user
   findNearest() {
