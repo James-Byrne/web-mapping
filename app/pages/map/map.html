@@ -6,6 +6,11 @@
 -->
 <ion-navbar *navbar>
   <ion-title>Map</ion-title>
+  <ion-buttons start>
+    <button (click)="findMe()">
+      <ion-icon name="locate"></ion-icon>
+    </button>
+  </ion-buttons>
   <ion-buttons end>
     <button (click)="findNearest()">
       <ion-icon name="add"></ion-icon>
