@@ -35,12 +35,11 @@ let leafletRouting = require("leaflet-routing-machine");
     - followUser() : Follow the users movements and orientation
     - getDublinFood() : Load all of the GeoServer data into the map view
     - findNearest() : Find the five nearest amenities and give the user directions to the choosen one
-
-  TODO : @functions
-    - followMe() : The user can set the screen to follow them, essentially making their location the center of the screen
-    - filterBy() : Allow a user to filter the type of amenity they are looking for by category
     - findMe() : Center the map on the userMarker on button press
     - loadNearby() : Load only the markes which should be on the screen
+
+  TODO : @functions
+    - filterBy() : Allow a user to filter the type of amenity they are looking for by category
 */
 
 @Page({
@@ -246,9 +245,6 @@ export class MapPage {
 
   // Find the 5 nearest markers to the user
   findNearest() {
-    // TODO : Destroy old route when new one is created
-    // TODO : Stop user from editing the route?
-
     // Create an index that can be used to search for the nearest marker
     let index = leafletKnn(L.geoJson(this.geoJson.features));
 
@@ -291,7 +287,7 @@ export class MapPage {
       }
     });
 
-    // Oen the alert to the user
+    // Open the alert to the user
     this.nav.present(alert).then(() => {
       this.radioOpen = true;
     });
