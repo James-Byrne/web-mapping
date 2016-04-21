@@ -178,6 +178,7 @@ export class MapPage {
     this.map.setView(this.userMarker.getLatLng(), 17);
   }
 
+  // Get the data fromt he server 
   getDublinFood() {
     // Make a http request to the server and get the data
     this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
