@@ -215,10 +215,26 @@ export class MapPage {
       }
     };
 
-    this.jsonLayer = L.geoJson(this.geoJson.features, {
-      onEachFeature: onEachFeature,
-      filter: filter
-    }).addTo(this.map);
+    // When the map is first loaded get the markers within the map bounds
+    this.map.on("load", () => {
+      this.jsonLayer = L.geoJson(this.geoJson.features, {
+        onEachFeature: onEachFeature,
+        filter: filter
+      }).addTo(this.map);
+    });
+
+    // When the user drags the map to a different area load the markers for that area
+    this.map.on("dragend", () => {
+      this.jsonLayer = L.geoJson(this.geoJson.features, {
+        onEachFeature: onEachFeature,
+        filter: filter
+      }).addTo(this.map);
+    });
+
+    // When the map is zoomed in or out clear the layers
+    this.map.on("zoomend", () => {
+      this.jsonLayer.clearLayers();
+    });
   }
 
   // Find the 5 nearest markers to the user
