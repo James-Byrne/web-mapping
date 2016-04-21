@@ -155,6 +155,8 @@ export class MapPage {
         this.nav.present(alert);
       });
 
+    // TODO : This is broken in the current builds, the device calibration is sometimes called but the icon does not rotate to follow the user
+    // No errors thrown by the app on the device 
     // Watch the device compass heading change
     this.userOrientation = DeviceOrientation.watchHeading().subscribe(
       (data) => {
