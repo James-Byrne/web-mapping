@@ -119,8 +119,6 @@ export class MapPage {
         // Add a popup to the userMarker
         this.userMarker.bindPopup("<h4>Your Location</h4>");
 
-        // let pruneCluster = new PruneClusterForLeaflet();
-
         // Follow the Users position
         this.followUser();
 
@@ -228,12 +226,11 @@ export class MapPage {
     };
 
     // When the map is first loaded get the markers within the map bounds
-    this.map.on("load", () => {
-      this.jsonLayer = L.geoJson(this.geoJson.features, {
-        onEachFeature: onEachFeature,
-        filter: filter
-      }).addTo(this.map);
-    });
+    this.jsonLayer = L.geoJson(this.geoJson.features, {
+      onEachFeature: onEachFeature,
+      filter: filter
+    }).addTo(this.map);
+
 
     // When the user drags the map to a different area load the markers for that area
     this.map.on("dragend", () => {
