@@ -4,7 +4,7 @@ import "rxjs/add/operator/map";
 
 // Import the Ionic Native Geolocation Plugin
 import {Geolocation} from "ionic-native";
-// Import the Ionic Native Deveice Orientation Plugin
+// Import the Ionic Native Device Orientation Plugin
 import {DeviceOrientation} from "ionic-native";
 
 // Suppress typescript errors
@@ -16,6 +16,9 @@ let leafletKnn = require("leaflet-knn");
 
 // Add the RotatedMarker functions to the leaflet marker class, see : https://github.com/bbecquet/Leaflet.RotatedMarker
 import "leaflet-rotatedmarker";
+
+// import the Leaflet.MarkerCluster library, see : https://github.com/Leaflet/Leaflet.markercluster
+// import "prunecluster";
 
 // Add the leaflet-routing-machine module, see : http://www.liedman.net/leaflet-routing-machine/
 let leafletRouting = require("leaflet-routing-machine");
@@ -116,6 +119,8 @@ export class MapPage {
         // Add a popup to the userMarker
         this.userMarker.bindPopup("<h4>Your Location</h4>");
 
+        // let pruneCluster = new PruneClusterForLeaflet();
+
         // Follow the Users position
         this.followUser();
 
@@ -178,7 +183,7 @@ export class MapPage {
     this.map.setView(this.userMarker.getLatLng(), 17);
   }
 
-  // Get the data fromt he server 
+  // Get the data fromt he server
   getDublinFood() {
     // Make a http request to the server and get the data
     this.http.get("http://mf2.dit.ie:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dit:dublin_food&outputFormat=json&srsName=epsg:4326").map(res => res.json()).subscribe(data => {
@@ -250,13 +255,10 @@ export class MapPage {
     let index = leafletKnn(L.geoJson(this.geoJson.features));
 
     // Get the 5 closest markers to the userMarker
-    let nearest = index.nearest(this.userMarker.getLatLng(), 5, 1000);
+    let nearest = index.nearest(this.userMarker.getLatLng(), 5, 2000);
 
     // List the five options in an alert
     let alert = Alert.create();
-
-    // Set the alerts title
-    alert.setTitle("5 closest");
 
     // Add an input for each of the nearest amenities
     for (let i = 0; i < nearest.length; i++) {
@@ -266,27 +268,39 @@ export class MapPage {
         value: [nearest[i].lat, nearest[i].lon].toString()
       });
     }
+
+    // If there is no amenities within 2km show a different alert
+    if (alert.data.inputs.length === 0) {
+      alert.setTitle("No amenities nearby");
+    } else {
+      // Set the alerts title
+      alert.setTitle("5 closest");
+
+      // Add the ok button which will return the users selected value
+      alert.addButton({
+        text: "OK",
+        handler: data => {
+          this.radioOpen = false;
+
+          // Check that the user has selected an item
+          if (data) {
+            // Split the data into two floats (Lat, Lng)
+            data = data.split(",");
+
+            // Plot a route from the user to their target
+            L.Routing.control({
+              waypoints: [
+                this.userMarker.getLatLng(),
+                [parseFloat(data[0]), parseFloat(data[1])]
+              ]
+            }).addTo(this.map);
+          }
+        }
+      });
+    }
+
     // Add a cancel button
     alert.addButton("Cancel");
-
-    // Add the ok button which will return the users selected value
-    alert.addButton({
-      text: "OK",
-      handler: data => {
-        this.radioOpen = false;
-
-        // Split the data into two floats (Lat, Lng)
-        data = data.split(",");
-
-        // Plot a route from the user to their target
-        L.Routing.control({
-          waypoints: [
-            this.userMarker.getLatLng(),
-            [parseFloat(data[0]), parseFloat(data[1])]
-          ]
-        }).addTo(this.map);
-      }
-    });
 
     // Open the alert to the user
     this.nav.present(alert).then(() => {
