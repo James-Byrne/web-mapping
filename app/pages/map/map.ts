@@ -17,9 +17,6 @@ let leafletKnn = require("leaflet-knn");
 // Add the RotatedMarker functions to the leaflet marker class, see : https://github.com/bbecquet/Leaflet.RotatedMarker
 import "leaflet-rotatedmarker";
 
-// import the Leaflet.MarkerCluster library, see : https://github.com/Leaflet/Leaflet.markercluster
-import "leaflet.markercluster";
-
 // Add the leaflet-routing-machine module, see : http://www.liedman.net/leaflet-routing-machine/
 let leafletRouting = require("leaflet-routing-machine");
 
@@ -197,7 +194,6 @@ export class MapPage {
   loadNearby() {
 
     // Function that is executed each time a marker is added
-    // TODO : Add markers to a cluster group, see : https://github.com/Leaflet/Leaflet.markercluster && https://github.com/DefinitelyTyped/DefinitelyTyped/blob/cc3d223a946f661eff871787edeb0fcb8f0db156/leaflet-markercluster/leaflet-markercluster-tests.ts
     // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html
     // TODO : Add the different categories to different layers, see : http://bl.ocks.org/zross/f0306ca14e8202a0fe73
     let onEachFeature = (feature, layer) => {
