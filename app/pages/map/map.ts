@@ -196,6 +196,8 @@ export class MapPage {
     // Function that is executed each time a marker is added
     // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html
     // TODO : Add the different categories to different layers, see : http://bl.ocks.org/zross/f0306ca14e8202a0fe73
+
+    // Add the name and cusine type to the popup or display "No information available" if not
     let onEachFeature = (feature, layer) => {
       // does this feature have a property named name
       if (feature.properties && feature.properties.name) {
@@ -216,7 +218,7 @@ export class MapPage {
       }
     };
 
-    // TODO : Filter out markers that should not be displayed
+    // Filter out markers that should not be displayed
     let filter = (feature, layer) => {
       // Look for the markers within the current maps bounds
       // The coords have to be specified as below in order for the function to read the features coords correctly
