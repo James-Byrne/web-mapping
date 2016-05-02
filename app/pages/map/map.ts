@@ -18,7 +18,7 @@ let leafletKnn = require("leaflet-knn");
 import "leaflet-rotatedmarker";
 
 // import the Leaflet.MarkerCluster library, see : https://github.com/Leaflet/Leaflet.markercluster
-// import "prunecluster";
+import "leaflet.markercluster";
 
 // Add the leaflet-routing-machine module, see : http://www.liedman.net/leaflet-routing-machine/
 let leafletRouting = require("leaflet-routing-machine");
@@ -213,6 +213,10 @@ export class MapPage {
         }
         // Add the popup to the icon with text
         layer.bindPopup(popupText);
+      } else {
+        // Inform the user there is no info about the location
+        let popupText = "No info available";
+        layer.bindPopup(popupText);
       }
     };
 
@@ -234,6 +238,7 @@ export class MapPage {
 
     // When the user drags the map to a different area load the markers for that area
     this.map.on("dragend", () => {
+      this.jsonLayer.clearLayers();
       this.jsonLayer = L.geoJson(this.geoJson.features, {
         onEachFeature: onEachFeature,
         filter: filter
@@ -243,6 +248,10 @@ export class MapPage {
     // When the map is zoomed in or out clear the layers
     this.map.on("zoomend", () => {
       this.jsonLayer.clearLayers();
+      this.jsonLayer = L.geoJson(this.geoJson.features, {
+        onEachFeature: onEachFeature,
+        filter: filter
+      }).addTo(this.map);
     });
   }
 
