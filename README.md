@@ -1,7 +1,10 @@
 #### Web Mapping Assignment
 
-This is an assignment for the web mapping module. The spec for the assignment is as follows
+Table of contents goes here 
 
+
+
+This is an assignment for the web mapping module. The spec for the assignment is as follows
 
 ##### Assignment - Dining in Dublin
 
