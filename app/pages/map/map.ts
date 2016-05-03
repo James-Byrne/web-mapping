@@ -37,9 +37,6 @@ let leafletRouting = require("leaflet-routing-machine");
     - findNearest() : Find the five nearest amenities and give the user directions to the choosen one
     - findMe() : Center the map on the userMarker on button press
     - loadNearby() : Load only the markes which should be on the screen
-
-  TODO : @functions
-    - filterBy() : Allow a user to filter the type of amenity they are looking for by category
 */
 
 @Page({
@@ -192,11 +189,6 @@ export class MapPage {
 
   // Load the nearby Markers
   loadNearby() {
-
-    // Function that is executed each time a marker is added
-    // TODO : Give the markers custom icons, see : http://leafletjs.com/examples/custom-icons.html
-    // TODO : Add the different categories to different layers, see : http://bl.ocks.org/zross/f0306ca14e8202a0fe73
-
     // Add the name and cusine type to the popup or display "No information available" if not
     let onEachFeature = (feature, layer) => {
       // does this feature have a property named name
